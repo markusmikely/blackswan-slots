@@ -1,14 +1,15 @@
-DEFAULT_FILE_IMAGE_SIZE = (250, 250)
+DEFAULT_FILE_IMAGE_SIZE = (300, 300)
 FPS = 120
 HEIGHT = 1000
-WIDTH = 1400
-SYMBOL_SIZE = 250
-START_X, START_Y = 0, -SYMBOL_SIZE
+WIDTH = 1520
+SYMBOL_SIZE = 300
+START_X, START_Y = 0, -300
 X_OFFSET, Y_OFFSET = 0, 0
 
 # Images
 BG_IMAGE_PATH = "graphics/neon/0-bg.jpg"
-GAME_INDICIES = [1, 2, 3] # 0 and 4 are outside of play area
+GRID_IMAGE_PATH = "graphics/neon/grid.png"
+GAME_INDICES = [1, 2, 3] # 0 and 4 are outside of play area
 SYM_PATH = "graphics/0/symbols"
 
 # 5 Symbols
