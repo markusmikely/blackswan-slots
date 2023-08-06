@@ -2,6 +2,7 @@ from debug import debug
 from player import Player
 from reel import *
 from settings import *
+from ui import UI
 from wins import *
 import pygame
 
@@ -22,16 +23,17 @@ class Machine:
 
         self.spawn_reels()
         self.curr_player = Player()
+        self.ui = UI(self.curr_player)
 
         # Import sounds
-        # self.spin_sound = pygame.mixer.Sound('audio/spinclip.mp3')
-        # self.spin_sound.set_volume(0.15)
-        # self.win_three = pygame.mixer.Sound('audio/winthree.wav')
-        # self.win_three.set_volume(0.6)
-        # self.win_four = pygame.mixer.Sound('audio/winfour.wav')
-        # self.win_four.set_volume(0.7)
-        # self.win_five = pygame.mixer.Sound('audio/winfive.wav')
-        # self.win_five.set_volume(0.8)
+        self.spin_sound = pygame.mixer.Sound('audio/spinclip.mp3')
+        self.spin_sound.set_volume(0.15)
+        self.win_three = pygame.mixer.Sound('audio/winone.mp3')
+        self.win_three.set_volume(0.6)
+        self.win_four = pygame.mixer.Sound('audio/wintwo.mp3')
+        self.win_four.set_volume(0.7)
+        self.win_five = pygame.mixer.Sound('audio/winthree.mp3')
+        self.win_five.set_volume(0.8)
 
     def cooldowns(self):
         # Only lets player spin if all reels are NOT spinning
@@ -47,10 +49,10 @@ class Machine:
             if self.check_wins(self.spin_result):
                 self.win_data = self.check_wins(self.spin_result)
                 # Play the win sound
-                # self.play_win_sound(self.win_data)
+                self.play_win_sound(self.win_data)
                 self.pay_player(self.win_data, self.curr_player)
-                # self.win_animation_ongoing = True
-                # self.ui.win_text_angle = random.randint(-4, 4)
+                self.win_animation_ongoing = True
+                self.ui.win_text_angle = random.randint(-4, 4)
                 
     def input(self):
         keys = pygame.key.get_pressed()
@@ -61,7 +63,7 @@ class Machine:
             self.spin_time = pygame.time.get_ticks()
             self.curr_player.place_bet()
             self.machine_balance += self.curr_player.bet_size
-            # self.curr_player.last_payout = None
+            self.curr_player.last_payout = None
                 
     def draw_reels(self, delta_time):
         for reel in self.reel_list:
@@ -85,14 +87,15 @@ class Machine:
 
             for reel in self.reel_list:
                 self.reel_list[reel].start_spin(int(reel) * 200)
-                # self.spin_sound.play()
+                self.spin_sound.play()
+                self.win_animation_ongoing = False
 
     def get_result(self):
         for reel in self.reel_list:
             self.spin_result[reel] = self.reel_list[reel].reel_spin_result()
         return self.spin_result
 
-    def check_wins(sef, result):
+    def check_wins(self, result):
         hits = {}
         horizontal = flip_horizontal(result)
         for row in horizontal:
@@ -104,6 +107,7 @@ class Machine:
                     if len(longest_seq(possible_win)) > 2:
                         hits[horizontal.index(row) + 1] = [sym, longest_seq(possible_win)]
         if hits:
+            self.can_animate = True
             return hits
 
     def pay_player(self, win_data, curr_player):
@@ -118,6 +122,31 @@ class Machine:
         curr_player.last_payout = spin_payout
         curr_player.total_won += spin_payout
 
+    def play_win_sound(self, win_data):
+        sum = 0
+        for item in win_data.values():
+            sum += len(item[1])
+        if sum == 3: self.win_three.play()
+        elif sum == 4: self.win_four.play()
+        elif sum > 4 : self.win_five.play()
+
+    def win_animation(self):
+        if self.win_animation_ongoing and self.win_data:
+            for k, v in list(self.win_data.items()):
+                if k == 1:
+                    animation_row = 3
+                elif k == 3:
+                    animation_row = 1
+                else:
+                    animation_row = 2
+                animation_cols = v[1]
+                for reel in self.reel_list:
+                    if reel in animation_cols and self.can_animate:
+                        self.reel_list[reel].symbol_list.sprites()[animation_row].fade_in = True
+                    for symbol in self.reel_list[reel].symbol_list:
+                        if not symbol.fade_in:
+                            symbol.fade_out = True
+
     def update(self, delta_time):
         self.cooldowns()
         self.input()
@@ -125,13 +154,15 @@ class Machine:
         for reel in self.reel_list:
             self.reel_list[reel].symbol_list.draw(self.display_surface)
             self.reel_list[reel].symbol_list.update()
+        self.ui.update()
+        self.win_animation()
 
         # Balannce/payout debugger
-        debug_player_data = self.curr_player.get_data()
-        machine_balance = "{:.2f}".format(self.machine_balance)   
-        if self.curr_player.last_payout:
-            last_payout = "{:.2f}".format(self.curr_player.last_payout)
-        else: 
-            last_payout = "N/A"
+        # debug_player_data = self.curr_player.get_data()
+        # machine_balance = "{:.2f}".format(self.machine_balance)   
+        # if self.curr_player.last_payout:
+        #     last_payout = "{:.2f}".format(self.curr_player.last_payout)
+        # else: 
+        #     last_payout = "N/A"
 
-        debug(f"Player balance: {debug_player_data['balance']} | Machine balance: {machine_balance} | Last payout: {last_payout}") 
+        # debug(f"Player balance: {debug_player_data['balance']} | Machine balance: {machine_balance} | Last payout: {last_payout}") 

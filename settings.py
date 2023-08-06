@@ -7,10 +7,16 @@ START_X, START_Y = 0, -300
 X_OFFSET, Y_OFFSET = 0, 0
 
 # Images
-BG_IMAGE_PATH = "graphics/neon/0-bg.jpg"
+BG_IMAGE_PATH = "graphics/neon/bg.jpg"
 GRID_IMAGE_PATH = "graphics/neon/grid.png"
 GAME_INDICES = [1, 2, 3] # 0 and 4 are outside of play area
 SYM_PATH = "graphics/0/symbols"
+
+#  Text
+TEXT_COLOR = "White"
+UI_FONT = 'graphics/font/kidspace.ttf' 
+UI_FONT_SIZE = 30
+WIN_FONT_SIZE = 60 
 
 # 5 Symbols
 symbols = {
@@ -20,3 +26,4 @@ symbols = {
     'fish': f"{SYM_PATH}/fish.png",
     'frog': f"{SYM_PATH}/frog.png"
 }
+

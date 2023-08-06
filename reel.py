@@ -11,8 +11,8 @@ class Reel:
         self.reel_is_spinning = False
 
         # Sounds
-        # self.stop_sound = pygame.mixer.Sound('audio/stop.mp3')
-        # self.stop_sound.set_volume(0.5)
+        self.stop_sound = pygame.mixer.Sound('audio/stop.mp3')
+        self.stop_sound.set_volume(0.5)
 
         for idx, item in enumerate(self.shuffled_keys):
             self.symbol_list.add(Symbol(symbols[item], pos, idx))
@@ -40,7 +40,7 @@ class Reel:
                     if symbol.rect.top == 1200:
                         if reel_is_stopping:
                             self.reel_is_spinning = False
-                            # self.stop_sound.play()
+                            self.stop_sound.play()
 
                         symbol_idx = symbol.idx
                         symbol.kill()
